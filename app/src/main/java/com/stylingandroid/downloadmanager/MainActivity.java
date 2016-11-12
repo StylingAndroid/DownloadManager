@@ -30,19 +30,6 @@ public class MainActivity extends AppCompatActivity implements Downloader.Listen
         downloader = Downloader.newInstance(this);
     }
 
-    @Override
-    public void fileDownloaded(Uri uri, String mimeType) {
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setDataAndType(uri, mimeType);
-        startActivity(intent);
-        updateUi();
-    }
-
-    @Override
-    public Context getContext() {
-        return getApplicationContext();
-    }
-
     void downloadOrCancel() {
         if (downloader.isDownloading()) {
             cancel();
@@ -61,6 +48,25 @@ public class MainActivity extends AppCompatActivity implements Downloader.Listen
         downloader.download(uri);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        downloader.register();
+    }
+
+    @Override
+    public void fileDownloaded(Uri uri, String mimeType) {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setDataAndType(uri, mimeType);
+        startActivity(intent);
+        updateUi();
+    }
+
+    @Override
+    public Context getContext() {
+        return getApplicationContext();
+    }
+
     private void updateUi() {
         if (downloader.isDownloading()) {
             download.setText(R.string.cancel);
@@ -70,8 +76,8 @@ public class MainActivity extends AppCompatActivity implements Downloader.Listen
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        downloader.cancel();
+    protected void onPause() {
+        downloader.unregister();
+        super.onPause();
     }
 }

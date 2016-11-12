@@ -9,7 +9,7 @@ class Downloader implements DownloadReceiver.Listener {
     private final Listener listener;
     private final DownloadManager downloadManager;
 
-    private DownloadReceiver receiver;
+    private DownloadReceiver receiver = null;
 
     private long downloadId = -1;
 
@@ -26,10 +26,20 @@ class Downloader implements DownloadReceiver.Listener {
 
     void download(Uri uri) {
         if (!isDownloading()) {
-            receiver = new DownloadReceiver(this);
-            receiver.register(listener.getContext());
+            register();
             DownloadManager.Request request = new DownloadManager.Request(uri);
             downloadId = downloadManager.enqueue(request);
+        }
+    }
+
+    boolean isDownloading() {
+        return downloadId >= 0;
+    }
+
+    void register() {
+        if (receiver == null && isDownloading()) {
+            receiver = new DownloadReceiver(this);
+            receiver.register(listener.getContext());
         }
     }
 
@@ -39,7 +49,7 @@ class Downloader implements DownloadReceiver.Listener {
             DownloadManager.Query query = new DownloadManager.Query();
             query.setFilterById(downloadId);
             downloadId = -1;
-            receiver.unregister(listener.getContext());
+            unregister();
             Cursor cursor = downloadManager.query(query);
             while (cursor.moveToNext()) {
                 getFileInfo(cursor);
@@ -48,22 +58,28 @@ class Downloader implements DownloadReceiver.Listener {
         }
     }
 
-    private void getFileInfo(Cursor cursor) {
-        String uriString = cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
-        String mimeType = cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_MEDIA_TYPE));
-        Uri uri = Uri.parse(uriString);
-        listener.fileDownloaded(uri, mimeType);
+    void unregister() {
+        if (receiver != null) {
+            receiver.unregister(listener.getContext());
+        }
+        receiver = null;
     }
 
-    boolean isDownloading() {
-        return downloadId >= 0;
+    private void getFileInfo(Cursor cursor) {
+        int status = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS));
+        if (status == DownloadManager.STATUS_SUCCESSFUL) {
+            String uriString = cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
+            String mimeType = cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_MEDIA_TYPE));
+            Uri uri = Uri.parse(uriString);
+            listener.fileDownloaded(uri, mimeType);
+        }
     }
 
     void cancel() {
         if (isDownloading()) {
             downloadManager.remove(downloadId);
             downloadId = -1;
-            receiver.unregister(listener.getContext());
+            unregister();
         }
     }
 
