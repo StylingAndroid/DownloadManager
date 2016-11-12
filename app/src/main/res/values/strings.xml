@@ -1,0 +1,5 @@
+<resources>
+  <string name="app_name">DownloadManager</string>
+  <string name="download">Download</string>
+  <string name="cancel">Cancel</string>
+</resources>
