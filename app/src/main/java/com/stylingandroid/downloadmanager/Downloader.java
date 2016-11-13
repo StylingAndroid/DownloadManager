@@ -27,11 +27,11 @@ class Downloader implements DownloadReceiver.Listener {
 
     void download(Uri uri) {
         if (!isDownloading()) {
-            register();
             DownloadManager.Request request = new DownloadManager.Request(uri);
             request.setTitle(getString(R.string.notification_title));
             request.setDescription(getString(R.string.notification_description));
             downloadId = downloadManager.enqueue(request);
+            register();
         }
     }
 
@@ -75,9 +75,9 @@ class Downloader implements DownloadReceiver.Listener {
     private void getFileInfo(Cursor cursor) {
         int status = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS));
         if (status == DownloadManager.STATUS_SUCCESSFUL) {
-            String uriString = cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
+            Long id = cursor.getLong(cursor.getColumnIndex(DownloadManager.COLUMN_ID));
+            Uri uri = downloadManager.getUriForDownloadedFile(id);
             String mimeType = cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_MEDIA_TYPE));
-            Uri uri = Uri.parse(uriString);
             listener.fileDownloaded(uri, mimeType);
         }
     }
