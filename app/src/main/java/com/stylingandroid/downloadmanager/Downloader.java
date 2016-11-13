@@ -68,9 +68,9 @@ class Downloader implements DownloadReceiver.Listener {
     private void getFileInfo(Cursor cursor) {
         int status = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS));
         if (status == DownloadManager.STATUS_SUCCESSFUL) {
-            String uriString = cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
+            Long id = cursor.getLong(cursor.getColumnIndex(DownloadManager.COLUMN_ID));
             String mimeType = cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_MEDIA_TYPE));
-            Uri uri = Uri.parse(uriString);
+            Uri uri = downloadManager.getUriForDownloadedFile(id);
             listener.fileDownloaded(uri, mimeType);
         }
     }
