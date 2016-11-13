@@ -26,9 +26,9 @@ class Downloader implements DownloadReceiver.Listener {
 
     void download(Uri uri) {
         if (!isDownloading()) {
-            register();
             DownloadManager.Request request = new DownloadManager.Request(uri);
             downloadId = downloadManager.enqueue(request);
+            register();
         }
     }
 

@@ -76,8 +76,8 @@ public class MainActivity extends AppCompatActivity implements Downloader.Listen
     }
 
     @Override
-    protected void onPause() {
+    protected void onDestroy() {
         downloader.unregister();
-        super.onPause();
+        super.onDestroy();
     }
 }
