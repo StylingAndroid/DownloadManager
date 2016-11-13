@@ -4,6 +4,7 @@ import android.app.DownloadManager;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.support.annotation.StringRes;
 
 class Downloader implements DownloadReceiver.Listener {
     private final Listener listener;
@@ -27,9 +28,15 @@ class Downloader implements DownloadReceiver.Listener {
     void download(Uri uri) {
         if (!isDownloading()) {
             DownloadManager.Request request = new DownloadManager.Request(uri);
+            request.setTitle(getString(R.string.notification_title));
+            request.setDescription(getString(R.string.notification_description));
             downloadId = downloadManager.enqueue(request);
             register();
         }
+    }
+
+    private String getString(@StringRes int resId) {
+        return listener.getContext().getString(resId);
     }
 
     boolean isDownloading() {
