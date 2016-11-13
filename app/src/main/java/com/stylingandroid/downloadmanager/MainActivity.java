@@ -49,12 +49,6 @@ public class MainActivity extends AppCompatActivity implements Downloader.Listen
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        downloader.register();
-    }
-
-    @Override
     public void fileDownloaded(Uri uri, String mimeType) {
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setDataAndType(uri, mimeType);
