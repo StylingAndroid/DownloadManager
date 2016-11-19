@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.support.annotation.StringRes;
 
 class Downloader implements DownloadReceiver.Listener {
+    private static final String DIRECTORY = "Download/DownloadManager";
     private final Listener listener;
     private final DownloadManager downloadManager;
 
@@ -30,6 +31,7 @@ class Downloader implements DownloadReceiver.Listener {
             DownloadManager.Request request = new DownloadManager.Request(uri);
             request.setTitle(getString(R.string.notification_title));
             request.setDescription(getString(R.string.notification_description));
+            request.setDestinationInExternalPublicDir(DIRECTORY, uri.getLastPathSegment());
             downloadId = downloadManager.enqueue(request);
             register();
         }
