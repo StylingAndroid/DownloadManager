@@ -37,7 +37,7 @@ class Downloader implements DownloadReceiver.Listener {
     }
 
     void register() {
-        if (receiver == null && isDownloading()) {
+        if (receiver == null) {
             receiver = new DownloadReceiver(this);
             receiver.register(listener.getContext());
         }
